@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "test:output": "node scripts/test-output.js"
   },
   "dependencies": {
     "dayjs": "^1.11.10",
