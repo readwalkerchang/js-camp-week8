@@ -52,6 +52,9 @@ function getDaysAgo(timestamp) {
   const today = dayjs();
   const pastDate = dayjs.unix(timestamp);
   const diffDays = today.diff(pastDate,'day');
+  if(diffDays === 0){
+    return '今天'
+  }
   return `${diffDays}天前`
 }
 
