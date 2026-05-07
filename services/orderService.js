@@ -3,7 +3,7 @@
 // ========================================
 
 const { createOrder, fetchOrders, updateOrderStatus, deleteOrder } = require('../api');
-const { validateOrderUser, formatDate, getDaysAgo, formatCurrency } = require('../utils');
+const { validateOrderUser, formatDate, getDaysAgo, formatCurrency, handleServiceAction } = require('../utils');
 
 /**
  * 建立新訂單
@@ -15,6 +15,12 @@ async function placeOrder(userInfo) {
   // 提示：先用 utils validateOrderUser() 驗證使用者資料，驗證失敗時回傳 { success: false, errors: [...] }
   // 驗證通過後，呼叫 createOrder() 建立訂單
   // 回傳格式：{ success: true, data: ... } / { success: false, errors: [...] }
+  const option = {
+    action: () =>createOrder(userInfo),
+    validator: () => validateOrderUser(userInfo),
+    errorKey: 'errors'
+  }
+  return handleServiceAction(option);
 }
 
 /**

@@ -142,6 +142,38 @@ function formatCurrency(amount) {
   return `NT$ ${amount.toLocaleString('zh-TW')}`;
 }
 
+
+/**
+ * 統一處理購物車操作
+ * 
+ * 這個函式會做三件事：
+ * 1. 如果有傳入 validator，就先驗證 value
+ * 2. 驗證失敗時，回傳失敗格式
+ * 3. 驗證成功或不需要驗證時，執行 action 並回傳成功格式
+ * 
+ * @param {Object} options - 操作設定
+ * @param {Function} options.action - 要執行的 API 動作
+ * @param {Function} [options.validator] - 驗證函式，沒有就不驗證
+ * @returns {Promise<Object>} 成功或失敗的結果
+ * @param {string} [options.errorKey='error'] - validation error field name
+ */
+async function handleServiceAction(option){
+    if(option.validator){
+      const valFunction = option.validator;
+      const valResult = valFunction();
+      const errorKey = option.errorKey || 'error';
+      if(valResult.isValid === false){
+        return { success: false, [errorKey]: valResult.errors };
+      }
+    }
+    const actionFunction = option.action
+    const actionResult = await actionFunction();
+    if(actionResult.status === false){
+      return { success: false, error: actionResult.message};
+    }
+    return { success: true, data: actionResult}; 
+}
+
 module.exports = {
   getDiscountRate,
   getAllCategories,
@@ -149,5 +181,6 @@ module.exports = {
   getDaysAgo,
   validateOrderUser,
   validateCartQuantity,
-  formatCurrency
+  formatCurrency,
+  handleServiceAction
 };
