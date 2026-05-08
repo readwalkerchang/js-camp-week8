@@ -380,3 +380,77 @@ dayjs.unix(timestamp)
 ```
 
 計算兩個日期差幾天。
+
+## 三元運算子
+
+三元運算子可以用來在一行裡根據條件回傳兩種不同結果。
+
+基本格式：
+
+```js
+條件 ? 條件成立時的值 : 條件不成立時的值
+```
+
+例如訂單付款狀態：
+
+```js
+paidText: order.paid ? '已付款' : '未付款'
+```
+
+意思是：
+
+- 如果 `order.paid` 是 `true`，`paidText` 就是 `'已付款'`
+- 如果 `order.paid` 是 `false`，`paidText` 就是 `'未付款'`
+
+## 邏輯 OR 運算子當預設值
+
+`||` 是邏輯 OR 運算子，也常用來設定預設值。
+
+基本格式：
+
+```js
+可能沒有值的資料 || 預設值
+```
+
+例如：
+
+```js
+const user = formattedOrder.user || {};
+```
+
+意思是：
+
+- 如果 `formattedOrder.user` 有值，就使用 `formattedOrder.user`
+- 如果 `formattedOrder.user` 沒有值，就使用空物件 `{}`
+
+這樣後面讀取：
+
+```js
+user.name
+```
+
+就比較不容易因為 `user` 是 `undefined` 而出錯。
+
+另一個例子：
+
+```js
+const products = Object.values(formattedOrder.products || {});
+```
+
+意思是：
+
+- 如果 `formattedOrder.products` 有值，就把它丟進 `Object.values()`
+- 如果沒有值，就用空物件 `{}`，讓 `Object.values({})` 回傳空陣列
+
+注意：`||` 會把以下值都當成沒有值：
+
+```js
+undefined
+null
+''
+0
+false
+NaN
+```
+
+所以如果 `0` 或空字串是合法資料，要小心不要直接用 `||` 當預設值。

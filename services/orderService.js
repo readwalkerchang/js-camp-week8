@@ -16,10 +16,10 @@ async function placeOrder(userInfo) {
   // 驗證通過後，呼叫 createOrder() 建立訂單
   // 回傳格式：{ success: true, data: ... } / { success: false, errors: [...] }
   const option = {
-    action: () =>createOrder(userInfo),
+    action: () => createOrder(userInfo),
     validator: () => validateOrderUser(userInfo),
     errorKey: 'errors'
-  }
+  };
   return handleServiceAction(option);
 }
 
@@ -30,6 +30,8 @@ async function placeOrder(userInfo) {
 async function getOrders() {
   // 請實作此函式
   // 提示：呼叫 fetchOrders() 取得訂單陣列並回傳
+  const orders = await fetchOrders();
+  return orders;
 }
 
 /**
@@ -39,6 +41,8 @@ async function getOrders() {
 async function getUnpaidOrders() {
   // 請實作此函式
   // 提示：呼叫 fetchOrders() 後，篩選出 paid 為 false 的訂單
+  const orders = await fetchOrders();
+  return orders.filter(item => item.paid === false);
 }
 
 /**
@@ -48,6 +52,8 @@ async function getUnpaidOrders() {
 async function getPaidOrders() {
   // 請實作此函式
   // 提示：呼叫 fetchOrders() 後，篩選出 paid 為 true 的訂單
+  const orders = await fetchOrders();
+  return orders.filter(item => item.paid === true);
 }
 
 /**
@@ -60,6 +66,10 @@ async function updatePaymentStatus(orderId, isPaid) {
   // 請實作此函式
   // 提示：呼叫 updateOrderStatus()
   // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  const option = {
+    action: () => updateOrderStatus(orderId, isPaid)
+  };
+  return handleServiceAction(option);
 }
 
 /**
@@ -71,6 +81,10 @@ async function removeOrder(orderId) {
   // 請實作此函式
   // 提示：呼叫 deleteOrder()
   // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  const option = {
+    action: () => deleteOrder(orderId)
+  };
+  return handleServiceAction(option);
 }
 
 /**
@@ -91,6 +105,18 @@ async function removeOrder(orderId) {
  */
 function formatOrder(order) {
   // 請實作此函式
+  return {
+    id: order.id,
+    user: order.user,
+    products: order.products,
+    total: order.total,
+    quantity: order.quantity,
+    totalFormatted: formatCurrency(order.total),
+    paid: order.paid,
+    paidText: order.paid ? '已付款' : '未付款',
+    createdAt: formatDate(order.createdAt),
+    daysAgo: getDaysAgo(order.createdAt)
+  };
 }
 
 /**
@@ -119,6 +145,40 @@ function displayOrders(orders) {
   // 商品明細：
   //   - 產品名稱 x 2（產品數量）
   // ========================================
+  if (!orders || orders.length === 0) {
+    console.log('沒有訂單');
+    return;
+  }
+
+  console.log('訂單列表：');
+  console.log('========================================');
+
+  orders.forEach((order, index) => {
+    const formattedOrder = formatOrder(order);
+    const user = formattedOrder.user || {};
+    const products = formattedOrder.products || {};
+
+    console.log(`訂單 ${index + 1}`);
+    console.log('----------------------------------------');
+    console.log(`訂單編號：${formattedOrder.id}`);
+    console.log(`顧客姓名：${user.name}`);
+    console.log(`聯絡電話：${user.tel}`);
+    console.log(`寄送地址：${user.address}`);
+    console.log(`付款方式：${user.payment}`);
+    console.log(`訂單金額：${formattedOrder.totalFormatted}`);
+    console.log(`付款狀態：${formattedOrder.paidText}`);
+    console.log(`建立時間：${formattedOrder.createdAt} (${formattedOrder.daysAgo})`);
+    console.log('----------------------------------------');
+    console.log('商品明細：');
+
+    products.forEach((item) => {
+      const product = item.product || item;
+      const quantity = item.quantity || item.qty || formattedOrder.quantity || 1;
+      console.log(`  - ${product.title} x ${quantity}`);
+    });
+
+    console.log('========================================');
+  });
 }
 
 module.exports = {
